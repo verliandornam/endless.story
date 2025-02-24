@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endless Story</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <header>
+    <a href="/">Endless Story</a>
+    <div>
+        {% if username %}
+            <span class="username">{{ username }},</span>
+            <span class="credits">{{ credits }} credits</span>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/reg-auth">Login</a>
+        {% endif %}
+    </div>
+  </header>
+
+  <div class="content">
+    <h2>Choose Your Adventure</h2>
+    <p>
+      With Endless Story, you can dive into an exciting adventure across various settings.
+      Become a powerful mage in a Fantasy world or the last survivor in a Post-Apocalyptic wasteland — the choice is yours!
+    </p>
+
+    <div class="stories-container">
+      <a href="/fantasy" class="stories-card">
+        <h3>Fantasy</h3>
+        <p>
+          Become a member of a Fantasy world inhabited by mythical beings. Immerse yourself in the atmosphere of a magical medieval era and become part of this enchanting world.
+        </p>
+      </a>
+
+      <a href="/sci-fi" class="stories-card">
+        <h3>Sci-Fi</h3>
+        <p>
+          In the world of science fiction, anything is possible! It’s like magic, but powered by science!
+          Use cutting-edge technology to achieve your goals. Explore and shape the world of a distant future.
+        </p>
+      </a>
+
+      <a href="/post-apocalyptic" class="stories-card">
+        <h3>Post-Apocalyptic</h3>
+        <p>
+          The world has ended... Or has it? You are one of the last survivors in a post-apocalyptic world.
+          Maybe even the only one. Explore this captivating world and learn how to survive against all odds!
+        </p>
+      </a>
+
+      <a href="/pirates" class="stories-card">
+        <h3>Pirates</h3>
+        <p>
+          Ahoy, landlubber! Ever dreamed of becoming a pirate? Now’s your chance!
+          Climb aboard a pirate ship and set sail in search of hidden treasures. But beware — you’re an outlaw now!
+        </p>
+      </a>
+
+      <a href="/space-civilization" class="stories-card">
+        <h3>Space Civilization</h3>
+        <p>
+          In the distant future, planet Earth has been destroyed. Now, civilization exists in space.
+          Feel what it’s like aboard a spaceship, or perhaps even discover a new planet for humanity to call home!
+        </p>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

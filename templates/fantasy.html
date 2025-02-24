@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endless Story</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <header>
+    <a href="/">Endless Story</a>
+    <div>
+        {% if username %}
+            <span class="username">{{ username }},</span>
+            <span class="credits">{{ credits }} credits</span>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/reg-auth">Login</a>
+        {% endif %}
+    </div>
+  </header>
+
+  <div class="content">
+  <div class="main"></div>
+  <h1>Endless Story — Fantasy</h1>
+  <div id="chat"></div>
+
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Your turn..." />
+    <button id="send-btn">Send</button>
+  </div>
+  </div>
+
+  <audio id="click-sound" src="{{ url_for('static', filename='note-sound.mp3') }}" preload="auto"></audio>
+
+  <script>
+    const chatBox = document.getElementById("chat");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+
+    const messages = [
+      {
+        role: "system",
+        content: "You are a storyteller guiding the user through a fantasy adventure. Respond briefly, avoiding emotions and embellishments. Keep all responses under 180 characters."
+      }
+    ];
+
+    window.onload = () => {
+      addMessage("assistant", "Welcome, brave hero!<br><br>You have entered the world of medieval fantasy.<br><br><strong>Now you can choose how to start your story</strong>");
+    };
+
+
+    function playSound() {
+      var sound = document.getElementById('click-sound');
+      sound.play();
+    }
+
+    sendBtn.addEventListener("click", async () => {
+      const input = userInput.value.trim();
+      if (input !== "") {
+        addMessage("user", input);
+        messages.push({ role: "user", content: input });
+        userInput.value = "";
+        const hasCredits = await checkCredits();
+    
+        if (hasCredits) {
+          await getAIResponse();
+        } else {
+          addMessage("system", "You don't have enough credits to make a request.");
+        }
+      }
+    });
+
+    userInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        sendBtn.click();
+      }
+    });
+
+    function addMessage(role, content) {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", role);
+      messageDiv.innerHTML = `<strong>${role === "user" ? "You" : "Storyteller"}:</strong> ${content}`;
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function checkCredits() {
+      try {
+        const response = await fetch('/check-credits', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          document.querySelector('.credits').textContent = `${data.credits} credits`;
+          return true;
+        } else {
+          return false;
+        }
+      } catch (error) {
+        console.error("Error checking credits:", error);
+        return false;
+      }
+    }
+
+    async function getAIResponse() {
+      addMessage("assistant", "<em>The storyteller thinks...</em>");
+      playSound();
+
+      try {
+        const requestMessages = [
+          {
+            "role": "system",
+            "content": "You are a storyteller guiding the user through a fantasy adventure. Respond briefly, avoiding emotions and embellishments. Keep all responses under 180 characters."
+          },
+          ...messages
+        ];
+
+        const response = await fetch("http://localhost:3000/get-response", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ messages: requestMessages })
+        });
+
+        const data = await response.json();
+
+        if (data.reply) {
+          addMessage("assistant", data.reply);
+          messages.push({ role: "assistant", content: data.reply });
+        } else {
+          addMessage("assistant", "<em>An error occurred. Please try again.</em>");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        addMessage("assistant", "<em>An error occurred. Please try again.</em>");
+      }
+      playSound();
+      const thinkingMessage = document.querySelector(".assistant em");
+      if (thinkingMessage) {
+        thinkingMessage.parentElement.remove();
+      }
+    }
+
+  </script>
+</body>
+</html>
