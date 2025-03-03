@@ -1,37 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Endless Story</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
-
 <body>
 
   <header>
     <a href="/">Endless Story</a>
     <div>
-      {% if username %}
-      <span class="username">{{ username }},</span>
-      <span class="credits">{{ credits }} credits</span>
-      <a href="/logout">Logout</a>
-      {% else %}
-      <a href="/reg-auth">Login</a>
-      {% endif %}
+        {% if username %}
+            <span class="username">{{ username }},</span>
+            <span class="credits">{{ credits }} credits</span>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/reg-auth">Login</a>
+        {% endif %}
     </div>
   </header>
 
   <div class="content">
-    <div class="main"></div>
-    <h1>Endless Story — Fantasy</h1>
-    <div id="chat"></div>
+  <div class="main"></div>
+  <h1>Endless Story — Space Civilization</h1>
+  <div id="chat"></div>
 
-    <div id="input-container">
-      <input type="text" id="user-input" placeholder="Your turn..." />
-      <button id="send-btn">Send</button>
-    </div>
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Your turn..." />
+    <button id="send-btn">Send</button>
+  </div>
   </div>
 
   <audio id="click-sound" src="{{ url_for('static', filename='note-sound.mp3') }}" preload="auto"></audio>
@@ -44,12 +42,12 @@
     const messages = [
       {
         role: "system",
-        content: "You are a storyteller guiding the user through a fantasy adventure. Respond briefly, avoiding emotions and embellishments. Keep all responses under 180 characters."
+        content: "You are a storyteller guiding the user through a space civilization adventure. Respond briefly, avoiding emotions and embellishments. Keep all responses under 180 characters."
       }
     ];
 
     window.onload = () => {
-      addMessage("assistant", "Welcome, brave hero!<br><br>You have entered the world of medieval fantasy.<br><br><strong>Now you can choose how to start your story</strong>");
+      addMessage("assistant", "Welcome, citezen!<br><br>You have entered the world of space civilization.<br><br><strong>Now you can choose how to start your story</strong>");
     };
 
 
@@ -65,7 +63,7 @@
         messages.push({ role: "user", content: input });
         userInput.value = "";
         const hasCredits = await checkCredits();
-
+    
         if (hasCredits) {
           await getAIResponse();
         } else {
@@ -108,7 +106,7 @@
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({ genre: "fantasy"})
+            body: JSON.stringify({ genre: "spacecivilization"})
           })
 
           return true;
@@ -129,7 +127,7 @@
         const requestMessages = [
           {
             "role": "system",
-            "content": "You are a storyteller guiding the user through a fantasy adventure. Respond briefly, avoiding emotions and embellishments. Keep all responses under 180 characters."
+            "content": "You are a storyteller guiding the user through a space civilization adventure. Respond briefly, avoiding emotions and embellishments. Keep all responses under 180 characters."
           },
           ...messages
         ];
@@ -163,5 +161,4 @@
 
   </script>
 </body>
-
 </html>

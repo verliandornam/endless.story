@@ -32,7 +32,7 @@ except Exception as ex:
 
 client = OpenAI(
     base_url="https://models.inference.ai.azure.com",
-    api_key="your-api",
+    api_key="your_api_key",
 )
 
 def hash_password(plain_password):
@@ -44,7 +44,7 @@ def check_password(plain_password, hashed_password):
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password)
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key'
+app.secret_key = 'yourkey'
 CORS(app)
 
 @app.route('/')
@@ -61,6 +61,30 @@ def fantasy():
     if 'userid' not in session:
         return redirect(url_for('main_page'))
     return render_template('fantasy.html', username=session.get('username'), credits=session.get('credits'), userid=session.get('userid'))
+
+@app.route('/sci-fi')
+def scifi():
+    if 'userid' not in session:
+        return redirect(url_for('main_page'))
+    return render_template('scifi.html', username=session.get('username'), credits=session.get('credits'), userid=session.get('userid'))
+
+@app.route('/post-apocalyptic')
+def postapocalyptic():
+    if 'userid' not in session:
+        return redirect(url_for('main_page'))
+    return render_template('postapocalyptic.html', username=session.get('username'), credits=session.get('credits'), userid=session.get('userid'))
+
+@app.route('/pirates')
+def pirates():
+    if 'userid' not in session:
+        return redirect(url_for('main_page'))
+    return render_template('pirates.html', username=session.get('username'), credits=session.get('credits'), userid=session.get('userid'))
+
+@app.route('/space-civilization')
+def spacecivilization():
+    if 'userid' not in session:
+        return redirect(url_for('main_page'))
+    return render_template('spacecivilization.html', username=session.get('username'), credits=session.get('credits'), userid=session.get('userid'))
 
 @app.route('/<path:path>')
 def serve_static(path):
@@ -199,6 +223,25 @@ def get_response():
     except Exception as e:
         print(f"OpenAI API Error: {e}")
         return jsonify({'error': 'Error with OpenAI API'}), 500
+
+
+@app.route('/update_playcount', methods=['POST'])
+def update_playcount():
+    data = request.json
+    genre = data.get('genre')
+
+    try:
+        connection = pymysql.connect(**db_config)
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT * FROM playcount WHERE genre = %s", (genre,))
+            row = cursor.fetchone()
+            if row:
+                new_count = row['count'] + 1
+                cursor.execute("UPDATE playcount SET count = %s WHERE genre = %s", (new_count, genre))
+                connection.commit()
+    finally:
+        if connection.open:
+            connection.close()
 
 if __name__ == '__main__':
     app.run(port=3000, debug=True)

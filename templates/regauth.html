@@ -83,9 +83,10 @@
         <div class="text">
             <h2>Login</h2>
         </div>
-        <form method="POST" action="/login_user">
+        <form method="POST" action="/login_user" onsubmit="return validation('login-username')">
             <div class="field">
-                <input type="text" name="username" placeholder="Username" required>
+                <input type="text" id="login-username" name="username" placeholder="Username" required
+                       pattern="^[a-zA-Z0-9._]{4,32}$" title="Username must be 4-32 characters long">
             </div>
             <div class="field">
                 <input type="password" name="password" placeholder="Password" required>
@@ -102,9 +103,10 @@
         <div class="text">
             <h2>Register</h2>
         </div>
-        <form method="POST" action="/new_user">
+        <form method="POST" action="/new_user" onsubmit="return validation('register-username')">
             <div class="field">
-                <input type="text" name="username" placeholder="Username" required>
+                <input type="text" id="register-username" name="username" placeholder="Username" required
+                       pattern="^[a-zA-Z0-9._]{4,32}$" title="Username must be 4-32 characters long">
             </div>
             <div class="field">
                 <input type="password" name="password" placeholder="Password" required>
@@ -122,6 +124,17 @@
             const views = document.querySelectorAll('.container');
             views.forEach(view => view.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
+        }
+        
+        function validation(inputId) {
+        const username = document.getElementById(inputId).value;
+        const regex = /^[a-zA-Z0-9._]{4,32}$/;
+        
+        if (!regex.test(username)) {
+            alert("Username must be 4-32 characters long");
+            return false;
+        }
+        return true;
         }
     </script>
 </body>
