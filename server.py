@@ -32,7 +32,7 @@ except Exception as ex:
 
 client = OpenAI(
     base_url="https://models.inference.ai.azure.com",
-    api_key="your_api_key",
+    api_key="your_key",
 )
 
 def hash_password(plain_password):
@@ -49,7 +49,19 @@ CORS(app)
 
 @app.route('/')
 def main_page():
-    return render_template('main.html', username=session.get('username'), credits=session.get('credits'))
+    connection = pymysql.connect(**db_config)
+    try:
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("""
+                SELECT p.genre, u.username 
+                FROM playcount p
+                LEFT JOIN users u ON p.lastuserid = u.id
+            """)
+            playcount_data = {row["genre"]: row["username"] or "Unknown" for row in cursor.fetchall()}
+
+    finally:
+        connection.close()
+    return render_template('main.html', username=session.get('username'), credits=session.get('credits'), playcount_data=playcount_data)
 
 @app.route('/reg-auth')
 def regauth():
@@ -228,6 +240,7 @@ def get_response():
 @app.route('/update_playcount', methods=['POST'])
 def update_playcount():
     data = request.json
+    userid = session['userid']
     genre = data.get('genre')
 
     try:
@@ -237,8 +250,8 @@ def update_playcount():
             row = cursor.fetchone()
             if row:
                 new_count = row['count'] + 1
-                cursor.execute("UPDATE playcount SET count = %s WHERE genre = %s", (new_count, genre))
-                connection.commit()
+                cursor.execute("UPDATE playcount SET count = %s, lastuserid = %s WHERE genre = %s", (new_count, userid, genre))
+            connection.commit()
     finally:
         if connection.open:
             connection.close()
